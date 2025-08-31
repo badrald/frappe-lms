@@ -1,7 +1,6 @@
 {
  "actions": [],
- "allow_rename": 1,
- "autoname": "field:isbn",
+ "autoname": "autoincrement",
  "creation": "2025-08-10 20:15:32.481204",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -9,11 +8,11 @@
  "field_order": [
   "main_information_section",
   "lbl_artical",
-  "isbn",
-  "article_name",
+  "title",
+  "publisher",
   "available_copies",
   "column_break_foiu",
-  "publisher",
+  "isbn",
   "status",
   "total_copies",
   "authros_information_section",
@@ -45,16 +44,7 @@
    "fieldtype": "Data",
    "label": "ISBN",
    "length": 13,
-   "reqd": 1,
    "unique": 1
-  },
-  {
-   "fieldname": "article_name",
-   "fieldtype": "Data",
-   "in_list_view": 1,
-   "label": "Article Name",
-   "length": 70,
-   "reqd": 1
   },
   {
    "fieldname": "column_break_foiu",
@@ -113,16 +103,24 @@
    "fieldtype": "Link",
    "label": "Category ",
    "options": "Category"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "length": 70,
+   "reqd": 1
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-08-23 12:48:33.470872",
+ "modified": "2025-08-25 08:43:43.382119",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "Book",
- "naming_rule": "By fieldname",
+ "naming_rule": "Autoincrement",
  "owner": "Administrator",
  "permissions": [
   {

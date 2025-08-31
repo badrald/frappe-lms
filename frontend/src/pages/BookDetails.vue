@@ -27,7 +27,7 @@
         <div class="lg:col-span-2">
           <div class="space-y-4">
             <div class="flex items-center gap-3">
-              <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ book?.article_name || '—' }}</h2>
+              <h2 class="text-2xl font-semibold text-gray-900 dark:text-gray-100">{{ book?.title || '—' }}</h2>
               <Badge :theme="book?.status === 'Active' ? 'green' : 'yellow'">{{ book?.status || 'Unknown' }}</Badge>
             </div>
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
@@ -68,7 +68,7 @@
         <div>
           <div
             class="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 rounded-lg flex items-center justify-center overflow-hidden">
-            <img v-if="book?.cover" :src="book.cover" :alt="book.article_name" class="w-full h-full object-cover" />
+            <img v-if="book?.cover" :src="book.cover" :alt="book.title" class="w-full h-full object-cover" />
             <BookOpenIcon v-else class="w-16 h-16 text-primary-600 dark:text-primary-400" />
           </div>
         </div>
@@ -80,7 +80,7 @@
     <ModernDialog v-model="showEdit">
       <template #title>تعديل بيانات الكتاب</template>
       <form @submit.prevent="submitEdit" class="space-y-4">
-        <FormInput v-model="editData.article_name" label="Title" />
+        <FormInput v-model="editData.title" label="Title" />
         <FormInput v-model="editData.isbn" label="ISBN" />
         <FormInput v-model="editData.publisher" label="Publisher" />
         <FormInput v-model="editData.status" label="Status" />
@@ -102,7 +102,7 @@
     <!-- Delete Dialog -->
     <ModernDialog v-model="showDelete">
       <template #title>تأكيد الحذف</template>
-      <div>هل تريد حذف <span class="font-bold">{{ book?.article_name }}</span>؟</div>
+      <div>هل تريد حذف <span class="font-bold">{{ book?.title }}</span>؟</div>
       <template #actions>
         <Button theme="gray" @click="showDelete = false">إلغاء</Button>
         <Button theme="red" @click="confirmDelete">حذف</Button>

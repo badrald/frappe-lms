@@ -3,14 +3,14 @@
         <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center p-4"
             @click.self="onBackdropClick">
             <!-- خلفية ناعمة ومتدرجة -->
-            <div class="absolute inset-0 bg-black/20 backdrop-blur-sm"></div>
+            <div class="absolute inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm"></div>
 
             <!-- المودال الرئيسي -->
-            <div class="relative bg-white dark:bg-gray-900 rounded-3xl shadow-xl w-full mx-4 overflow-hidden modal-container"
+            <div class="relative bg-white dark:bg-gray-800 rounded-3xl shadow-xl w-full mx-4 overflow-hidden modal-container"
                 :class="dialogWidthClass">
 
                 <button v-if="closable" @click="closeDialog"
-                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-800 dark:hover:bg-gray-700 transition-all duration-200 flex items-center justify-center group z-10">
+                    class="absolute top-3 right-3 w-8 h-8 rounded-full bg-red-100 hover:bg-red-200 dark:bg-red-900/50 dark:hover:bg-red-800 transition-all duration-200 flex items-center justify-center group z-10">
                     <svg class="w-4 h-4 text-gray-500 group-hover:text-gray-700 dark:text-gray-400 dark:group-hover:text-gray-200 transition-colors"
                         fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                         <path d="M6 18L18 6M6 6l12 12" />
@@ -28,7 +28,7 @@
                             <h3 class="text-lg font-semibold text-gray-900 dark:text-white leading-6">
                                 <slot name="title">{{ title }}</slot>
                             </h3>
-                            <p v-if="$slots.description" class="mt-1 text-sm text-gray-500 dark:text-gray-400">
+                            <p v-if="$slots.description" class="mt-1 text-sm text-gray-500 dark:text-gray-300">
                                 <slot name="description" />
                             </p>
                         </div>
@@ -36,7 +36,7 @@
                         <!-- الأيقونة -->
                         <div class="flex-shrink-0 mr-4">
                             <div
-                                class="w-12 h-12  rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-700 flex items-center justify-center shadow-lg">
+                                class="w-12 h-12  rounded-2xl bg-gradient-to-br from-blue-500 to-blue-600 dark:from-blue-600 dark:to-blue-800 flex items-center justify-center shadow-lg">
                                 <slot name="icon">
                                     <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="1.5"
                                         viewBox="0 0 24 24">
@@ -55,7 +55,7 @@
                 <div class="px-6 pb-6">
                     <div v-if="$slots.media || layout === 'split'" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
                         <section class="lg:col-span-2 order-1 lg:order-2">
-                            <div class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                            <div class="text-gray-600 dark:text-gray-200 text-sm leading-relaxed">
                                 <slot />
                             </div>
                         </section>
@@ -63,17 +63,17 @@
                             <slot name="media" />
                         </aside>
                     </div>
-                    <div v-else class="text-gray-600 dark:text-gray-300 text-sm leading-relaxed">
+                    <div v-else class="text-gray-600 dark:text-gray-200 text-sm leading-relaxed">
                         <slot />
                     </div>
                 </div>
 
                 <!-- منطقة الأزرار -->
-                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/50 border-t border-gray-200 dark:border-gray-700">
+                <div class="px-6 py-4 bg-gray-50 dark:bg-gray-700/50 border-t border-gray-200 dark:border-gray-600">
                     <div class="flex justify-end space-x-3 rtl:space-x-reverse">
                         <slot name="actions">
                             <button v-if="closable" @click="closeDialog"
-                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-300 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900">
+                                class="px-4 py-2 text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 border border-gray-300 dark:border-gray-600 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors duration-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800">
                                 إغلاق
                             </button>
                         </slot>
@@ -147,7 +147,7 @@ const dialogWidthClass = computed(() => {
 .modal-container {
     animation: modalSlideIn 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
     box-shadow:
-        0 25px 50px -12px rgba(0, 0, 0, 0.15),
+        0 25px 50px -12px rgba(0, 0, 0, 0.25),
         0 0 0 1px rgba(0, 0, 0, 0.05);
 }
 
@@ -167,7 +167,7 @@ const dialogWidthClass = computed(() => {
 .modal-container:hover {
     transform: translateY(-1px);
     box-shadow:
-        0 32px 64px -12px rgba(0, 0, 0, 0.2),
+        0 32px 64px -12px rgba(0, 0, 0, 0.3),
         0 0 0 1px rgba(0, 0, 0, 0.05);
     transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
@@ -214,14 +214,14 @@ button:hover::before {
 @media (prefers-color-scheme: dark) {
     .modal-container {
         box-shadow:
-            0 25px 50px -12px rgba(0, 0, 0, 0.4),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
+            0 25px 50px -12px rgba(0, 0, 0, 0.5),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
     }
 
     .modal-container:hover {
         box-shadow:
-            0 32px 64px -12px rgba(0, 0, 0, 0.5),
-            0 0 0 1px rgba(255, 255, 255, 0.05);
+            0 32px 64px -12px rgba(0, 0, 0, 0.6),
+            0 0 0 1px rgba(255, 255, 255, 0.1);
     }
 }
 

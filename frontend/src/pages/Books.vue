@@ -29,7 +29,7 @@
               class="w-full h-full form-select bg-white dark:bg-secondary-800 text-gray-900 dark:text-gray-100 border border-secondary-100 dark:border-secondary-700 rounded-lg">
               <option value="">جميع الحالات</option>
               <option value="Active">متاح</option>
-              <option value="Inactive">مستعار</option>
+              <option value="Inactive" fetch_book_details_from_isbn>مستعار</option>
             </select>
           </div>
         </div>
@@ -43,13 +43,12 @@
           <!-- Book Cover -->
           <div
             class="aspect-[3/4] bg-gradient-to-br from-primary-100 to-primary-200 dark:from-primary-900 dark:to-primary-800 rounded-lg mb-4 flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
-            <img v-if="book.cover" :src="book.cover" :alt="book.article_name"
-              class="w-full h-full object-cover rounded-lg">
+            <img v-if="book.cover" :src="book.cover" :alt="book.title" class="w-full h-full object-cover rounded-lg">
             <BookOpenIcon v-else class="w-12 h-12 text-primary-600 dark:text-primary-400" />
           </div>
         </div>
         <div class="p-4">
-          <h3 class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">{{ book.article_name }}</h3>
+          <h3 class="font-semibold text-gray-900 dark:text-gray-100 line-clamp-2">{{ book.title }}</h3>
           <p class="text-sm text-gray-600 dark:text-gray-400">{{ book.publisher }}</p>
           <p class="text-xs text-gray-500 dark:text-gray-500">ISBN: {{ book.isbn }}</p>
           <p class="text-xs text-gray-500 dark:text-gray-500">الفئة: {{ book.category }}</p>
@@ -101,9 +100,17 @@
 
       <!-- Body -->
       <form @submit.prevent="addBook" class="space-y-4">
+
+
+        <div class="grid grid-cols-4 gap-4 items-end">
+          <FormInput v-model="newBook.isbn" label="رقم ISBN" id="isbn" name="isbn" :required="true"
+            class="col-span-3 w-full" />
+          <Button @click="getBookData()"
+            class="w-full h-[44px] bg-success-800 text-white flex items-center justify-center hover:bg-success-400">جلب
+            بيانات</Button>"
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput v-model="newBook.article_name" label="عنوان الكتاب" name="article_name" :required="true" />
-          <FormInput v-model="newBook.isbn" label="رقم ISBN" name="isbn" :required="true" />
+          <FormInput v-model="newBook.title" id="title" label="عنوان الكتاب" name="title`" :required="true" />
           <FormInput v-model="newBook.publisher" label="الناشر" name="publisher" :suggestions="publisherSuggestions" />
           <FormSelect v-model="newBook.status" label="الحالة" name="status" dir="rtl" :options="[
             { label: 'Active', value: 'Active' },
@@ -117,13 +124,8 @@
         <!-- Description -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="add_description">الوصف</label>
-          <textarea
-            id="add_description"
-            name="description"
-            v-model="newBook.description"
-            rows="4"
-            class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400 dark:placeholder-gray-500 px-4 py-2"
-          ></textarea>
+          <textarea id="add_description" name="description" v-model="newBook.description" rows="4"
+            class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400 dark:placeholder-gray-500 px-4 py-2"></textarea>
         </div>
 
         <!-- Authors -->
@@ -132,28 +134,19 @@
             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">المؤلفون</p>
             <Button size="sm" theme="primary" @click.prevent="addAuthorRow">إضافة مؤلف</Button>
           </div>
-          <div v-if="!newBook.authors_names.length" class="text-sm text-gray-500">لا يوجد مؤلفون، اضغط "إضافة مؤلف" لإضافة مؤلف.</div>
-          <div v-for="(row, idx) in newBook.authors_names" :key="`author-row-${idx}`" class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-            <FormSelect
-              v-model="row.author"
-              :options="authorsOptions"
-              :name="`author_${idx}`"
-              label="المؤلف"
-              placeholder="اختر المؤلف"
-              clearable
-            />
-            <FormSelect
-              v-model="row.role"
-              :options="roleOptions"
-              :name="`role_${idx}`"
-              label="الدور"
-              placeholder="اختر الدور"
-              clearable
-            />
+          <div v-if="!newBook.authors_names.length" class="text-sm text-gray-500">لا يوجد مؤلفون، اضغط "إضافة مؤلف"
+            لإضافة
+            مؤلف.</div>
+          <div v-for="(row, idx) in newBook.authors_names" :key="`author-row-${idx}`"
+            class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+            <FormSelect v-model="row.author" :options="authorsOptions" :name="`author_${idx}`" label="المؤلف"
+              placeholder="اختر المؤلف" clearable />
+            <FormSelect v-model="row.role" :options="roleOptions" :name="`role_${idx}`" label="الدور"
+              placeholder="اختر الدور" clearable />
             <div>
               <Button theme="red" @click.prevent="removeAuthorRow(idx)">حذف</Button>
             </div>
-          </div>
+          </div>الرئ
         </div>
       </form>
 
@@ -176,7 +169,7 @@
       <!-- Body -->
       <form @submit.prevent="updateBook" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput v-model="editBookData.article_name" label="Title" />
+          <FormInput v-model="editBookData.title" label="Title" />
           <FormInput v-model="editBookData.isbn" label="ISBN" />
           <FormInput v-model="editBookData.publisher" label="Publisher" name="publisher_edit"
             :suggestions="publisherSuggestions" />
@@ -222,7 +215,7 @@
       <div class="space-y-4">
         <p>
           هل أنت متأكد أنك تريد حذف
-          <span class="font-bold">{{ deleteBookData.article_name }}</span>؟
+          <span class="font-bold">{{ deleteBookData.title }}</span>؟
         </p>
       </div>
 
@@ -243,7 +236,7 @@ import { Button, Card, Input, Badge, FeatherIcon, frappeRequest } from 'frappe-u
 import ModernDialog from '../components/ModernDialog.vue'
 import FormInput from '../components/FormInput.vue'
 import FormSelect from '../components/FormSelect.vue'
-import { booksResource, addBook as addBookApi, updateBook as updateBookApi, deleteBook as deleteBookApi, uploadBookCover } from '../data/books'
+import { booksResource, addBook as addBookApi, updateBook as updateBookApi, deleteBook as deleteBookApi, uploadBookCover, FeatchBookData } from '../data/books'
 import { addToast } from '../utils/toast'
 
 const router = useRouter()
@@ -279,7 +272,7 @@ const onEditCoverSelected = (e) => {
 }
 
 const newBook = ref({
-  article_name: '',
+  title: '',
   isbn: '',
   publisher: '',
   status: 'Active',
@@ -292,7 +285,7 @@ const newBook = ref({
 
 const editBookData = ref({
   name: '',
-  article_name: '',
+  title: '',
   isbn: '',
   publisher: '',
   status: 'Active',
@@ -300,7 +293,7 @@ const editBookData = ref({
 
 const deleteBookData = ref({
   name: '',
-  article_name: '',
+  title: '',
 })
 
 const filteredBooks = computed(() => {
@@ -311,7 +304,7 @@ const filteredBooks = computed(() => {
   if (searchQuery.value) {
     const q = searchQuery.value.toLowerCase()
     books = books.filter(book =>
-      (book.article_name && book.article_name.toLowerCase().includes(q)) ||
+      (book.title && book.title.toLowerCase().includes(q)) ||
       (book.publisher && book.publisher.toLowerCase().includes(q)) ||
       (book.isbn && book.isbn.toLowerCase().includes(q))
     )
@@ -368,18 +361,6 @@ function removeAuthorRow(idx) {
 }
 
 
-const getStatusText = (status) => {
-  switch (status) {
-    case 'Active':
-      return 'متاح'
-    case 'Inactive':
-      return 'مستعار'
-    default:
-      return 'غير محدد'
-  }
-}
-
-
 const addBook = async () => {
   // Client-side validation for required fields
   const isbn = (newBook.value.isbn || '').toString().trim()
@@ -390,6 +371,9 @@ const addBook = async () => {
 
   const payload = { ...newBook.value }
 
+  // Explicitly ensure ISBN is in payload
+  payload.isbn = isbn
+
   // Clean authors list
   if (Array.isArray(payload.authors_names)) {
     payload.authors_names = payload.authors_names
@@ -397,23 +381,35 @@ const addBook = async () => {
       .map(r => ({ author: r.author, role: r.role || 'Author' }))
   }
 
-  // Upload cover if provided
-  if (addCoverFile.value) {
-    const up = await uploadBookCover(addCoverFile.value)
-    if (up.success) {
-      payload.cover = up.file_url
-    } else {
-      const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
+  // First, create the book without the cover
+  let response = await addBookApi(payload)
+
+  // Then, upload the cover image if provided
+  if (response.success && addCoverFile.value) {
+    try {
+      const up = await uploadBookCover(addCoverFile.value, response.data.name)
+      if (up.success) {
+        // Update the book with the cover URL
+        const updatePayload = {
+          name: response.data.name,
+          cover: up.file_url
+        }
+        await updateBookApi(updatePayload)
+      } else {
+        const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
+        addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
+      }
+    } catch (error) {
+      const msg = extractErrorMessage(error) || 'فشل في رفع صورة الغلاف.'
       addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
     }
   }
 
-  const response = await addBookApi(payload)
   if (response.success) {
     addToast({ type: 'success', title: 'تم الحفظ', message: 'تم إضافة الكتاب بنجاح.' })
     showAddBookModal.value = false
     newBook.value = {
-      article_name: '',
+      title: '',
       isbn: '',
       publisher: '',
       status: 'Active',
@@ -427,7 +423,13 @@ const addBook = async () => {
     addCoverFile.value = null
     addCoverPreview.value = null
   } else {
-    const msg = extractErrorMessage(response.error) || 'حدث خطأ أثناء إضافة الكتاب.'
+    // Improved error handling with more specific messages
+    let msg = 'حدث خطأ أثناء إضافة الكتاب.'
+    if (response.error && response.error.message) {
+      msg = response.error.message
+    } else {
+      msg = extractErrorMessage(response.error) || msg
+    }
     addToast({ type: 'error', title: 'فشل الحفظ', message: msg })
   }
 }
@@ -458,15 +460,21 @@ const updateBook = async () => {
     editCoverFile.value = null
     editCoverPreview.value = null
   } else {
-    const msg = extractErrorMessage(response.error) || 'حدث خطأ أثناء تحديث بيانات الكتاب.'
+    // Improved error handling with more specific messages
+    let msg = 'حدث خطأ أثناء تحديث بيانات الكتاب.'
+    if (response.error && response.error.message) {
+      msg = response.error.message
+    } else {
+      msg = extractErrorMessage(response.error) || msg
+    }
     addToast({ type: 'error', title: 'فشل التحديث', message: msg })
   }
 }
 
-const deleteBook = (book) => {
-  deleteBookData.value = { name: book.name, article_name: book.article_name }
-  showDeleteBookModal.value = true
-}
+// const deleteBook = (book) => {
+//   deleteBookData.value = { name: book.name, title: book.title }
+//   showDeleteBookModal.value = true
+// }
 
 const confirmDeleteBook = async () => {
   const response = await deleteBookApi(deleteBookData.value.name)
@@ -474,7 +482,13 @@ const confirmDeleteBook = async () => {
     addToast({ type: 'success', title: 'تم الحذف', message: 'تم حذف الكتاب بنجاح.' })
     showDeleteBookModal.value = false
   } else {
-    const msg = extractErrorMessage(response.error) || 'حدث خطأ أثناء حذف الكتاب.'
+    // Improved error handling with more specific messages
+    let msg = 'حدث خطأ أثناء حذف الكتاب.'
+    if (response.error && response.error.message) {
+      msg = response.error.message
+    } else {
+      msg = extractErrorMessage(response.error) || msg
+    }
     addToast({ type: 'error', title: 'فشل الحذف', message: msg })
   }
 }
@@ -548,4 +562,55 @@ function normalizeFrappeMessage(msg) {
     return msg?.toString?.() || ''
   }
 }
+
+const getBookData = async () => {
+  const isbn = newBook.value.isbn
+  if (!isbn) {
+    addToast({ type: 'error', title: 'ISBN مطلوب', message: 'الرجاء إدخال رقم ISBN لجلب البيانات' })
+    return
+  }
+
+  try {
+    // Show loading state
+    const originalText = event.target?.textContent || 'جلب بيانات'
+    if (event.target) {
+      event.target.textContent = 'جارٍ الجلب...'
+      event.target.disabled = true
+    }
+
+    const response = await FeatchBookData(isbn)
+    
+    if (response.success) {
+      // Populate the form with fetched data
+      const data = response.data.fields || {}
+      newBook.value.title = data.title || newBook.value.title
+      newBook.value.publisher = data.publisher || newBook.value.publisher
+      newBook.value.description = data.description || newBook.value.description
+      newBook.value.category = data.category || newBook.value.category
+      
+      // Handle authors if provided
+      if (response.data.authors && Array.isArray(response.data.authors)) {
+        newBook.value.authors_names = response.data.authors.map(author => ({
+          author: author.author,
+          role: author.role || 'Author'
+        }))
+      }
+      
+      addToast({ type: 'success', title: 'تم جلب البيانات', message: 'تم جلب بيانات الكتاب بنجاح' })
+    } else {
+      const errorMsg = response.error?.message || 'فشل في جلب بيانات الكتاب'
+      addToast({ type: 'error', title: 'خطأ', message: errorMsg })
+    }
+  } catch (error) {
+    addToast({ type: 'error', title: 'خطأ', message: 'حدث خطأ أثناء جلب بيانات الكتاب' })
+  } finally {
+    // Restore button state
+    if (event && event.target) {
+      event.target.disabled = false
+      event.target.textContent = 'جلب بيانات'
+    }
+  }
+}
+
+
 </script>

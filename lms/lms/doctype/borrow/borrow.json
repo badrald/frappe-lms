@@ -9,14 +9,15 @@
   "brrow_information_section",
   "borrow_id",
   "return",
-  "status",
+  "borrow_status",
   "column_break_nlya",
   "borrow_date",
   "due_date",
   "links_section",
   "member",
   "column_break_bfiz",
-  "book"
+  "book",
+  "amended_from"
  ],
  "fields": [
   {
@@ -68,22 +69,33 @@
    "options": "Book"
   },
   {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Borrowed\nReturned\nOverdue"
-  },
-  {
    "fieldname": "return",
    "fieldtype": "Link",
    "label": "Return",
    "options": "Return"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Borrow",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "borrow_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pendding\nRejected\nBorrowed\nReturned\nOverdue"
   }
  ],
  "grid_page_length": 50,
  "index_web_pages_for_search": 1,
+ "is_submittable": 1,
  "links": [],
- "modified": "2025-08-13 11:54:12.494380",
+ "modified": "2025-08-24 10:27:21.488479",
  "modified_by": "Administrator",
  "module": "LMS",
  "name": "Borrow",

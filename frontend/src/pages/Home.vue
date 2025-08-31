@@ -17,17 +17,17 @@
         <div class="w-16 h-16 bg-gradient-primary rounded-full mx-auto mb-4 flex items-center justify-center">
           <BookOpenIcon class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">1,234</h3>
+        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">{{ formatNumber(stats.total_books) }}</h3>
         <p class="text-sm text-secondary-600 dark:text-secondary-400">إجمالي الكتب</p>
       </div>
 
-      <!-- Active Members -->
+      <!-- Available Books -->
       <div class="card-3d p-6 text-center hover:scale-105 transition-transform duration-300">
         <div class="w-16 h-16 bg-gradient-to-r from-success-500 to-success-600 rounded-full mx-auto mb-4 flex items-center justify-center">
           <UsersIcon class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">456</h3>
-        <p class="text-sm text-secondary-600 dark:text-secondary-400">الأعضاء النشطون</p>
+        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">{{ formatNumber(stats.available_books) }}</h3>
+        <p class="text-sm text-secondary-600 dark:text-secondary-400">الكتب المتاحة</p>
       </div>
 
       <!-- Books Borrowed -->
@@ -35,17 +35,17 @@
         <div class="w-16 h-16 bg-gradient-to-r from-warning-500 to-warning-600 rounded-full mx-auto mb-4 flex items-center justify-center">
           <ArrowsRightLeftIcon class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">89</h3>
+        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">{{ formatNumber(stats.borrowed_books) }}</h3>
         <p class="text-sm text-secondary-600 dark:text-secondary-400">كتب معارة حالياً</p>
       </div>
 
-      <!-- Overdue Books -->
+      <!-- Categories Count -->
       <div class="card-3d p-6 text-center hover:scale-105 transition-transform duration-300">
         <div class="w-16 h-16 bg-gradient-to-r from-danger-500 to-danger-600 rounded-full mx-auto mb-4 flex items-center justify-center">
           <ExclamationTriangleIcon class="w-8 h-8 text-white" />
         </div>
-        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">12</h3>
-        <p class="text-sm text-secondary-600 dark:text-secondary-400">كتب متأخرة</p>
+        <h3 class="text-2xl font-bold text-secondary-900 dark:text-secondary-100">{{ formatNumber((stats.categories || []).length) }}</h3>
+        <p class="text-sm text-secondary-600 dark:text-secondary-400">عدد التصنيفات</p>
       </div>
     </div>
 
@@ -172,7 +172,7 @@ import { createResource } from "frappe-ui"
 import { ref, computed } from "vue"
 import { useRouter } from "vue-router"
 import { session } from "../data/session"
-import ServerTest from "../components/ServerTest.vue"
+import { statsResource } from "../data/books"
 import {
   BookOpenIcon,
   UsersIcon,
@@ -193,6 +193,14 @@ const ping = createResource({
 
 const showDialog = ref(false)
 const isDevelopment = computed(() => import.meta.env.DEV)
+
+// Stats from backend
+const stats = computed(() => statsResource.data?.data || {})
+const formatNumber = (v) => {
+  if (v === null || v === undefined) return '—'
+  const n = Number(v)
+  return Number.isFinite(n) ? n.toLocaleString() : '—'
+}
 
 // Sample recent activities data
 const recentActivities = ref([

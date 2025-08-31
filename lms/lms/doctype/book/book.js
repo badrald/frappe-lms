@@ -73,7 +73,7 @@ function fetch_book_details(frm) {
         callback: function(response) {
             if (response.message) {
                 const f = response.message.fields || {};
-                if (f.article_name) frm.set_value('article_name', f.article_name);
+                if (f.title) frm.set_value('title', f.title);
                 if (f.description) frm.set_value('description', f.description);
                 if (f.publisher) frm.set_value('publisher', f.publisher);
                 if (f.cover) frm.set_value('cover', f.cover);

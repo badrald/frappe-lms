@@ -21,7 +21,7 @@
               </div>
             </div>
             <!-- Footer -->
-            <footer class="bg-white/80 backdrop-blur-sm border-t mt-8 ">
+            <footer class="bg-white/80 backdrop-blur-sm border-t mt-8 dark:bg-secondary-800/80">
               <div class="px-4 sm:px-6 lg:px-8 py-6">
                 <div class="flex flex-col md:flex-row justify-between items-center">
                   <div class="flex items-center space-x-4">
@@ -29,13 +29,13 @@
                       <BookOpenIcon class="w-5 h-5 text-white" />
                     </div>
                     <div>
-                      <p class="text-sm font-medium text-secondary-900">نظام إدارة المكتبة</p>
-                      <p class="text-xs text-secondary-500">© 2025 جميع الحقوق محفوظة</p>
+                      <p class="text-sm font-medium text-secondary-900 dark:text-secondary-100">نظام إدارة المكتبة</p>
+                      <p class="text-xs text-secondary-500 dark:text-secondary-400">© 2025 جميع الحقوق محفوظة</p>
                     </div>
                   </div>
                   <div class="mt-4 md:mt-0">
-                    <p class="text-xs text-secondary-500">
-                      تم التطوير بواسطة <a href="https://github.com/badrald">بدر الدين عبد الله </a>
+                    <p class="text-xs text-secondary-500 dark:text-secondary-400">
+                      تم التطوير بواسطة <a href="https://github.com/badrald" class="text-secondary-700 hover:text-primary-600 dark:text-secondary-300 dark:hover:text-primary-400">بدر الدين عبد الله </a>
                     </p>
                   </div>
                 </div>

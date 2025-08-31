@@ -3,6 +3,7 @@
 
 import frappe
 from frappe import _
+import requests
 
 
 @frappe.whitelist()
@@ -10,7 +11,7 @@ def get_all_books():
     """Get all books with basic information"""
     books = frappe.get_all("Book", fields=[
         "name", 
-        "article_name", 
+        "title", 
         "isbn", 
         "publisher", 
         "status", 
@@ -26,6 +27,7 @@ def get_all_books():
 def get_book_by_id(book_id):
     """Get specific book by ID with full details"""
     try:
+        # Using frappe.get_doc following Frappe's document API pattern
         book = frappe.get_doc("Book", book_id)
         
         # Get authors
@@ -44,7 +46,7 @@ def get_book_by_id(book_id):
         
         return {"success": True, "data": book_dict}
     except frappe.DoesNotExistError:
-        return {"success": False, "message": "Book not found"}
+        frappe.throw(_("Book not found"), frappe.DoesNotExistError)
 
 
 @frappe.whitelist()
@@ -54,7 +56,7 @@ def search_books(query="", category="", status="", limit=20):
     
     if query:
         filters.extend([
-            ['article_name', 'like', f'%{query}%'],
+            ['title', 'like', f'%{query}%'],
             'or',
             ['isbn', 'like', f'%{query}%'],
         ])
@@ -69,7 +71,7 @@ def search_books(query="", category="", status="", limit=20):
         filters=filters if filters else None,
         fields=[
             "name", 
-            "article_name", 
+            "title", 
             "isbn", 
             "publisher", 
             "status", 
@@ -93,7 +95,7 @@ def get_available_books():
         ],
         fields=[
             "name", 
-            "article_name", 
+            "title", 
             "isbn", 
             "publisher", 
             "cover",
@@ -112,7 +114,7 @@ def get_books_by_category(category):
         filters={"category": category},
         fields=[
             "name", 
-            "article_name", 
+            "title", 
             "isbn", 
             "publisher", 
             "description",
@@ -151,85 +153,146 @@ def get_book_stats():
         }
     }
 
-
 @frappe.whitelist()
-def add_book(**kwargs):
-    """Add a new Book doc. Accepts JSON body with Book fields."""
-    allowed_fields = {
-        "article_name", "isbn", "publisher", "status", "cover",
-        "total_copies", "available_copies", "category", "description", "authors_names"
-    }
-
-    # Basic validation to provide clearer, earlier messages
-    if not kwargs.get("isbn"):
-        return {"success": False, "message": _("ISBN is required")}
-    if not kwargs.get("article_name"):
-        return {"success": False, "message": _("Title is required")}
-
+def add_book(**book_data):
     try:
-        doc = frappe.new_doc("Book")
-        for key, val in kwargs.items():
-            if key == "authors_names" and isinstance(val, (list, tuple)):
-                # Reset and append authors child rows
-                doc.set("authors_names", [])
-                for row in val:
-                    author = row.get("author") if isinstance(row, dict) else None
-                    if author:
-                        child = doc.append("authors_names", {})
-                        child.author = author
-                        child.role = row.get("role") if isinstance(row, dict) else None
-            elif key in allowed_fields:
-                doc.set(key, val)
-        doc.insert()
-        frappe.db.commit()
-        return {"success": True, "data": {"name": doc.name}}
-    except Exception as e:
-        # Log full traceback for debugging; return concise message to client
-        frappe.log_error(frappe.get_traceback(), _("Add Book Failed"))
-        return {"success": False, "message": str(e)}
+        # Ensure related docs exist (Category, Publisher) by label if provided
+        category = book_data.get("category")
+        publisher_name = book_data.get("publisher")
 
+        if category:
+            existing_category = frappe.db.get_value("Category", {"category_name": category}, "name")
+            if not existing_category:
+                frappe.get_doc({
+                    "doctype": "Category",
+                    "category_name": category,
+                }).insert(ignore_permissions=True)
 
-@frappe.whitelist()
-def update_book(**kwargs):
-    """Update an existing Book. Requires 'name' and any fields to update."""
-    name = kwargs.get("name")
-    if not name:
-        return {"success": False, "message": _("Parameter 'name' is required")}
-    allowed_fields = {
-        "article_name", "isbn", "publisher", "status", "cover",
-        "total_copies", "available_copies", "category", "description", "authors_names"
-    }
-    try:
-        doc = frappe.get_doc("Book", name)
-        for key, val in kwargs.items():
-            if key == "authors_names" and isinstance(val, (list, tuple)):
-                # Replace authors child table with provided rows
-                doc.set("authors_names", [])
-                for row in val:
-                    author = row.get("author") if isinstance(row, dict) else None
-                    if author:
-                        child = doc.append("authors_names", {})
-                        child.author = author
-                        child.role = row.get("role") if isinstance(row, dict) else None
-            elif key in allowed_fields:
-                doc.set(key, val)
-        doc.save()
-        frappe.db.commit()
-        return {"success": True, "data": {"name": doc.name}}
+        if publisher_name:
+            existing_publisher = frappe.db.get_value("Publisher", {"publisher_name": publisher_name}, "name")
+            if not existing_publisher:
+                frappe.get_doc({
+                    "doctype": "Publisher",
+                    "publisher_name": publisher_name,
+                }).insert(ignore_permissions=True)
+
+        # Create the Book document from provided fields
+        book = frappe.get_doc({
+            "doctype": "Book",
+            **book_data,
+        })
+        book.insert()
+
+        return {"success": True, "data": book.as_dict()}
+    except frappe.PermissionError as e:
+        return {"success": False, "error": _(f"Permission denied: {str(e)}")}
     except Exception as e:
-        frappe.log_error(frappe.get_traceback(), _("Update Book Failed"))
-        return {"success": False, "message": str(e)}
+        return {"success": False, "error": str(e)}
+
 
 
 @frappe.whitelist()
-def delete_book(name):
-    """Delete a Book by name."""
-    if not name:
-        return {"success": False, "message": _("Parameter 'name' is required")}
-    try:
-        frappe.delete_doc("Book", name)
-        frappe.db.commit()
-        return {"success": True}
-    except Exception as e:
-        frappe.log_error(frappe.get_traceback(), _("Delete Book Failed"))
-        return {"success": False, "message": str(e)}
+def fetch_book_details_from_isbn(isbn):
+        """Fetch book details from Google Books API using this document's ISBN,
+        upsert related Author/Publisher, and populate Book fields.
+        """
+        isbn = (isbn or '').strip()
+        if not isbn:
+            frappe.throw(_('Please enter an ISBN first'))
+
+        # Normalize: remove dashes/spaces
+        clean_isbn = isbn.replace('-', '').replace(' ', '')
+        if len(clean_isbn) not in (10, 13):
+            frappe.throw(_('Please enter a valid ISBN (10 or 13 digits)'))
+
+        url = f'https://www.googleapis.com/books/v1/volumes?q=isbn:{clean_isbn}'
+        try:
+            response = requests.get(url, timeout=10)
+            response.raise_for_status()
+            data = response.json() or {}
+        except Exception as exc:
+            frappe.throw(_('Failed to fetch from Google Books API: {0}').format(frappe.safe_decode(str(exc))))
+
+        items = data.get('items') or []
+        if not items:
+            frappe.throw(_('No book details found for ISBN {0}').format(clean_isbn))
+
+        volume_info = (items[0] or {}).get('volumeInfo') or {}
+
+        title = volume_info.get('title')
+        authors = volume_info.get('authors') or []
+        publisher_name = volume_info.get('publisher')
+        description = volume_info.get('description')
+        image_links = volume_info.get('imageLinks') or {}
+        categories = volume_info.get("categories") or []
+
+
+        # Prefer higher-res image if available
+        category = categories[0] if categories else ''
+        
+
+        cover_url = image_links.get('thumbnail').split("&zoom=1")[0]
+
+        # Ensure Author docs exist (by author_name) and collect their docnames
+        author_docnames = []
+        for author_title in authors:
+            existing_name = frappe.db.get_value("Author", {"author_name": author_title}, "name")
+            if existing_name:
+                author_docnames.append(existing_name)
+            else:
+                author_doc = frappe.get_doc({
+                    "doctype": "Author",
+                    "author_name": author_title
+                })
+                author_doc.insert(ignore_permissions=True)
+                author_docnames.append(author_doc.name)
+
+       
+        # Only create category if it exists and is not empty
+        if category:
+            existing_category = frappe.db.get_value("Category", {"category_name": category}, "name")
+            if not existing_category:
+                category_doc = frappe.get_doc({
+                    "doctype": "Category",
+                    "category_name": category
+                })
+                category_doc.insert(ignore_permissions=True)
+
+        # Ensure Publisher exists (by publisher_name)
+        if publisher_name:
+            exists_publisher = frappe.db.get_value("Publisher", {"publisher_name": publisher_name}, "name")
+            if not exists_publisher:
+                new_publisher = frappe.get_doc({
+                    "doctype": "Publisher",
+                    "publisher_name": publisher_name
+                })
+                new_publisher.insert(ignore_permissions=True)
+
+
+        # Prepare updates
+        updated_fields = {}
+        if title:
+            updated_fields['title'] = title
+        if description:
+            updated_fields['description'] = description
+        if cover_url:
+            updated_fields['cover'] = cover_url
+        if publisher_name:
+            updated_fields['publisher'] = publisher_name
+        if category: 
+            updated_fields['category'] = category
+
+        # Clear existing authors and add new ones through child table
+        self.authors_names = []
+        author_rows = []
+        for i, author_docname in enumerate(author_docnames):
+            row = self.append("authors_names", {})
+            row.author = author_docname
+            row.role = "Author" if i == 0 else "Co-Author"
+            author_rows.append({"author": author_docname, "role": row.role})
+
+        return {
+            'updated': True,
+            'fields': updated_fields,
+            'authors': author_rows,
+        }

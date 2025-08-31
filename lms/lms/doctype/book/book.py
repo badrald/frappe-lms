@@ -90,7 +90,7 @@ class Book(Document):
         # Prepare updates
         updated_fields = {}
         if title:
-            updated_fields['article_name'] = title
+            updated_fields['title'] = title
         if description:
             updated_fields['description'] = description
         if cover_url:
@@ -119,7 +119,7 @@ class Book(Document):
     def clear_fetched_data(self):
         """Clear fields populated from external sources, keeping only ISBN."""
         fields_to_clear = {
-            'article_name': None,
+            'title': None,
             'publisher': None,
             'description': None,
             'cover': None,

@@ -30,8 +30,8 @@
     <FancyDataTable :columns="columns" :data="filteredCategories" :page-size="12" :sortable="true">
       <template #actions="{ row }">
         <div class="flex space-x-2">
-          <Button @click="editCategory(row)" size="sm" theme="gray">Edit</Button>
-          <Button @click="deleteCategory(row)" size="sm" theme="red" class="ml-2">Delete</Button>
+          <Button @click="editCategory(row)"  theme="gray">Edit</Button>
+          <Button @click="deleteCategory(row)"  theme="red" class="ml-2">Delete</Button>
         </div>
       </template>
     </FancyDataTable>
