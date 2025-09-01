@@ -26,7 +26,7 @@ export const createBookDetailsResource = (bookId) =>
 function buildBookPayload(input = {}, { requireMandatory = true } = {}) {
   const payload = {
     // Mandatory in Book: title
-    title:input.title,
+    title: input.title,
     isbn: input.isbn,
     publisher: input.publisher,
     status: input.status,
@@ -36,6 +36,23 @@ function buildBookPayload(input = {}, { requireMandatory = true } = {}) {
     category: input.category ?? input.category_id ?? input.categoryName,
     description: input.description,
   }
+  
+  // Handle authors if provided
+  if (input.authors_names && Array.isArray(input.authors_names)) {
+    // Clean and filter authors data
+    const cleanedAuthors = input.authors_names
+      .filter(r => r && (r.author || r.author_name)) // Accept both author and author_name
+      .map(r => ({
+        author: r.author || r.author_name, // Use author or author_name
+        role: r.role || 'Author'
+      }))
+    
+    // Only add authors_names to payload if there are valid authors
+    if (cleanedAuthors.length > 0) {
+      payload.authors_names = cleanedAuthors
+    }
+  }
+
   // Remove undefined keys
   Object.keys(payload).forEach((k) => payload[k] === undefined && delete payload[k])
   if (requireMandatory) {
@@ -61,7 +78,7 @@ export const addBook = async (bookData) => {
     const res = await frappeRequest({
       method: 'POST',
       url: 'lms.api.books.add_book',
-      params:data,
+      params: data,  // Changed from params to data to send in request body
     })
     const payload = res?.message ?? res
     const created = payload?.data ?? payload
@@ -91,14 +108,17 @@ export const FeatchBookData = async (isbn) => {
     })
 
     const payload = res?.message ?? res
-    if (payload?.success) {
-      return { success: true, data: payload.data }
+    
+    // Handle the response format from the updated backend API
+    if (payload && payload.updated) {
+      return { success: true, data: payload }
     } else {
       const msg = payload?.message || 'Failed to fetch book data'
       return { success: false, error: new Error(msg), server: payload }
     }
   } catch (error) {
     console.error('Error fetching book data:', error)
+    return { success: false, error }
   }
 }
 
@@ -115,7 +135,7 @@ export const updateBook = async (bookData) => {
     const res = await frappeRequest({
       method: 'PUT',
       url: `/api/resource/Book/${encodeURIComponent(name)}`,
-      params: data,
+      data: data,  // Changed from params to data to send in request body
     })
     const payload = res?.message ?? res
     const updated = payload?.data ?? payload

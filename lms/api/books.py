@@ -176,17 +176,56 @@ def add_book(**book_data):
                     "publisher_name": publisher_name,
                 }).insert(ignore_permissions=True)
 
+        # Handle authors data
+        authors_data = book_data.pop("authors_names", None)
+        
         # Create the Book document from provided fields
         book = frappe.get_doc({
             "doctype": "Book",
             **book_data,
         })
+        
+        # Handle authors if provided
+        if authors_data and isinstance(authors_data, list):
+            for author_info in authors_data:
+                # Check if author is a string (author name) or dict with author and role
+                if isinstance(author_info, str):
+                    # If it's just a string, treat it as author name with default role
+                    author_name = author_info
+                    role = "Author"
+                elif isinstance(author_info, dict):
+                    # If it's a dict, extract author and role
+                    author_name = author_info.get("author") or author_info.get("author_name")
+                    role = author_info.get("role", "Author")
+                else:
+                    continue  # Skip invalid author data
+                
+                if author_name:
+                    # Check if author exists, create if not
+                    existing_author = frappe.db.get_value("Author", {"author_name": author_name}, "name")
+                    if not existing_author:
+                        author_doc = frappe.get_doc({
+                            "doctype": "Author",
+                            "author_name": author_name
+                        })
+                        author_doc.insert(ignore_permissions=True)
+                        author_name = author_doc.name
+                    else:
+                        author_name = existing_author
+                    
+                    # Add author to book
+                    book.append("authors_names", {
+                        "author": author_name,
+                        "role": role
+                    })
+
         book.insert()
 
         return {"success": True, "data": book.as_dict()}
     except frappe.PermissionError as e:
         return {"success": False, "error": _(f"Permission denied: {str(e)}")}
     except Exception as e:
+        frappe.log_error(frappe.get_traceback(), "Error adding book")
         return {"success": False, "error": str(e)}
 
 
@@ -226,48 +265,73 @@ def fetch_book_details_from_isbn(isbn):
         image_links = volume_info.get('imageLinks') or {}
         categories = volume_info.get("categories") or []
 
-
         # Prefer higher-res image if available
         category = categories[0] if categories else ''
         
-
-        cover_url = image_links.get('thumbnail').split("&zoom=1")[0]
+        cover_url = None
+        if image_links.get('thumbnail'):
+            # Safely handle thumbnail URL processing
+            thumbnail = image_links.get('thumbnail')
+            if "&zoom=1" in thumbnail:
+                cover_url = thumbnail.split("&zoom=1")[0]
+            else:
+                cover_url = thumbnail
 
         # Ensure Author docs exist (by author_name) and collect their docnames
         author_docnames = []
-        for author_title in authors:
-            existing_name = frappe.db.get_value("Author", {"author_name": author_title}, "name")
-            if existing_name:
-                author_docnames.append(existing_name)
-            else:
-                author_doc = frappe.get_doc({
-                    "doctype": "Author",
-                    "author_name": author_title
-                })
-                author_doc.insert(ignore_permissions=True)
-                author_docnames.append(author_doc.name)
+        if authors:
+            # Batch check existing authors to improve performance
+            existing_authors = frappe.db.get_all(
+                "Author", 
+                filters={"author_name": ["in", authors]}, 
+                fields=["name", "author_name"]
+            )
+            existing_author_map = {author.author_name: author.name for author in existing_authors}
+            
+            # Handle new authors
+            for author_title in authors:
+                if author_title in existing_author_map:
+                    author_docnames.append(existing_author_map[author_title])
+                else:
+                    try:
+                        author_doc = frappe.get_doc({
+                            "doctype": "Author",
+                            "author_name": author_title
+                        })
+                        author_doc.insert(ignore_permissions=True)
+                        author_docnames.append(author_doc.name)
+                    except Exception:
+                        # Continue with other authors even if one fails
+                        frappe.log_error(f"Failed to create author: {author_title}")
+                        continue
 
-       
         # Only create category if it exists and is not empty
         if category:
             existing_category = frappe.db.get_value("Category", {"category_name": category}, "name")
             if not existing_category:
-                category_doc = frappe.get_doc({
-                    "doctype": "Category",
-                    "category_name": category
-                })
-                category_doc.insert(ignore_permissions=True)
+                try:
+                    category_doc = frappe.get_doc({
+                        "doctype": "Category",
+                        "category_name": category
+                    })
+                    category_doc.insert(ignore_permissions=True)
+                except Exception:
+                    frappe.log_error(f"Failed to create category: {category}")
 
         # Ensure Publisher exists (by publisher_name)
+        publisher_created = False
         if publisher_name:
             exists_publisher = frappe.db.get_value("Publisher", {"publisher_name": publisher_name}, "name")
             if not exists_publisher:
-                new_publisher = frappe.get_doc({
-                    "doctype": "Publisher",
-                    "publisher_name": publisher_name
-                })
-                new_publisher.insert(ignore_permissions=True)
-
+                try:
+                    new_publisher = frappe.get_doc({
+                        "doctype": "Publisher",
+                        "publisher_name": publisher_name
+                    })
+                    new_publisher.insert(ignore_permissions=True)
+                    publisher_created = True
+                except Exception:
+                    frappe.log_error(f"Failed to create publisher: {publisher_name}")
 
         # Prepare updates
         updated_fields = {}
@@ -282,15 +346,13 @@ def fetch_book_details_from_isbn(isbn):
         if category: 
             updated_fields['category'] = category
 
-        # Clear existing authors and add new ones through child table
-        self.authors_names = []
+        # Prepare author rows (without using 'self' since this is a standalone function)
         author_rows = []
         for i, author_docname in enumerate(author_docnames):
-            row = self.append("authors_names", {})
-            row.author = author_docname
-            row.role = "Author" if i == 0 else "Co-Author"
-            author_rows.append({"author": author_docname, "role": row.role})
+            role = "Author" if i == 0 else "Co-Author"
+            author_rows.append({"author": author_docname, "role": role})
 
+        print(updated_fields)
         return {
             'updated': True,
             'fields': updated_fields,

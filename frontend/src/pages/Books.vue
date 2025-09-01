@@ -88,12 +88,12 @@
           <div
             class="aspect-[3/4] rounded-xl overflow-hidden border border-secondary-200 dark:border-secondary-700 bg-secondary-50 dark:bg-secondary-800 flex items-center justify-center">
             <img v-if="addCoverPreview" :src="addCoverPreview" class="w-full h-full object-cover" />
-            <BookOpenIcon v-else class="w-10 h-10 text-secondary-400" />
+            <BookOpenIcon v-else class="w-8 h-8 text-secondary-400" />
           </div>
           <div>
             <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Cover</label>
             <input type="file" accept="image/*" @change="onAddCoverSelected"
-              class="block w-full text-sm text-gray-900 dark:text-gray-100" />
+              class="block w-full text-sm text-gray-900 dark:text-gray-100 file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:text-sm file:font-semibold file:bg-primary-600 file:text-white hover:file:bg-primary-700" />
           </div>
         </div>
       </template>
@@ -102,12 +102,12 @@
       <form @submit.prevent="addBook" class="space-y-4">
 
 
-        <div class="grid grid-cols-4 gap-4 items-end">
+        <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
           <FormInput v-model="newBook.isbn" label="رقم ISBN" id="isbn" name="isbn" :required="true"
-            class="col-span-3 w-full" />
-          <Button @click="getBookData()"
-            class="w-full h-[44px] bg-success-800 text-white flex items-center justify-center hover:bg-success-400">جلب
-            بيانات</Button>"
+            class="sm:col-span-3 w-full" />
+          <Button @click="getBookData"
+            class="w-full h-[42px] bg-success-800 text-white flex items-center justify-center hover:bg-success-400 text-sm">جلب
+            بيانات</Button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput v-model="newBook.title" id="title" label="عنوان الكتاب" name="title`" :required="true" />
@@ -124,29 +124,29 @@
         <!-- Description -->
         <div class="space-y-2">
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300" for="add_description">الوصف</label>
-          <textarea id="add_description" name="description" v-model="newBook.description" rows="4"
-            class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400 dark:placeholder-gray-500 px-4 py-2"></textarea>
+          <textarea id="add_description" name="description" v-model="newBook.description" rows="3"
+            class="block w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-white focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 focus:border-transparent transition duration-200 ease-in-out placeholder-gray-400 dark:placeholder-gray-500 px-4 py-2 text-sm"></textarea>
         </div>
 
         <!-- Authors -->
         <div class="space-y-3">
-          <div class="flex items-center justify-between">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
             <p class="text-sm font-medium text-gray-700 dark:text-gray-300">المؤلفون</p>
-            <Button size="sm" theme="primary" @click.prevent="addAuthorRow">إضافة مؤلف</Button>
+            <Button size="sm" theme="primary" @click.prevent="addAuthorRow" class="w-full sm:w-auto">إضافة مؤلف</Button>
           </div>
           <div v-if="!newBook.authors_names.length" class="text-sm text-gray-500">لا يوجد مؤلفون، اضغط "إضافة مؤلف"
             لإضافة
             مؤلف.</div>
           <div v-for="(row, idx) in newBook.authors_names" :key="`author-row-${idx}`"
             class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-            <FormSelect v-model="row.author" :options="authorsOptions" :name="`author_${idx}`" label="المؤلف"
-              placeholder="اختر المؤلف" clearable />
+            <FormInput v-model="row.author" :name="`author_${idx}`" label="المؤلف"
+              :suggestions="authorSuggestions" placeholder="أدخل اسم المؤلف" clearable />
             <FormSelect v-model="row.role" :options="roleOptions" :name="`role_${idx}`" label="الدور"
               placeholder="اختر الدور" clearable />
             <div>
               <Button theme="red" @click.prevent="removeAuthorRow(idx)">حذف</Button>
             </div>
-          </div>الرئ
+          </div>
         </div>
       </form>
 
@@ -169,15 +169,15 @@
       <!-- Body -->
       <form @submit.prevent="updateBook" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput v-model="editBookData.title" label="Title" />
-          <FormInput v-model="editBookData.isbn" label="ISBN" />
+          <FormInput v-model="editBookData.title" label="Title" class="w-full" />
+          <FormInput v-model="editBookData.isbn" label="ISBN" class="w-full" />
           <FormInput v-model="editBookData.publisher" label="Publisher" name="publisher_edit"
-            :suggestions="publisherSuggestions" />
-          <FormInput v-model="editBookData.status" label="Status" />
+            :suggestions="publisherSuggestions" class="w-full" />
+          <FormInput v-model="editBookData.status" label="Status" class="w-full" />
           <FormInput v-model="editBookData.category" label="Category" name="category_edit"
-            :suggestions="categorySuggestions" />
-          <FormInput v-model="editBookData.total_copies" label="Total Copies" />
-          <FormInput v-model="editBookData.available_copies" label="Available Copies" />
+            :suggestions="categorySuggestions" class="w-full" />
+          <FormInput v-model="editBookData.total_copies" label="Total Copies" class="w-full" />
+          <FormInput v-model="editBookData.available_copies" label="Available Copies" class="w-full" />
         </div>
       </form>
 
@@ -332,6 +332,11 @@ const categorySuggestions = computed(() => {
   return Array.from(new Set(vals))
 })
 
+const authorSuggestions = computed(() => {
+  // Extract author names from authorsOptions for suggestions
+  return authorsOptions.value.map(option => option.label)
+})
+
 // Authors select options and roles
 const authorsOptions = ref([])
 const roleOptions = [
@@ -346,9 +351,13 @@ async function loadAuthorsOptions() {
     const payload = res?.message ?? res
     if (payload?.success) {
       authorsOptions.value = (payload.data || []).map(a => ({ label: a.author_name, value: a.name }))
+    } else {
+      // Handle case where payload.success is false or undefined
+      authorsOptions.value = []
     }
   } catch (e) {
     // silent fail; author select will just be empty
+    authorsOptions.value = []
   }
 }
 
@@ -376,35 +385,46 @@ const addBook = async () => {
 
   // Clean authors list
   if (Array.isArray(payload.authors_names)) {
-    payload.authors_names = payload.authors_names
-      .filter(r => r && r.author)
-      .map(r => ({ author: r.author, role: r.role || 'Author' }))
-  }
-
-  // First, create the book without the cover
-  let response = await addBookApi(payload)
-
-  // Then, upload the cover image if provided
-  if (response.success && addCoverFile.value) {
-    try {
-      const up = await uploadBookCover(addCoverFile.value, response.data.name)
-      if (up.success) {
-        // Update the book with the cover URL
-        const updatePayload = {
-          name: response.data.name,
-          cover: up.file_url
-        }
-        await updateBookApi(updatePayload)
-      } else {
-        const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
-        addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
-      }
-    } catch (error) {
-      const msg = extractErrorMessage(error) || 'فشل في رفع صورة الغلاف.'
-      addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
+    // Filter out empty authors and map to the correct structure
+    const cleanedAuthors = payload.authors_names
+      .filter(r => r && (r.author || r.author_name)) // Accept both author and author_name
+      .map(r => ({
+        author: r.author || r.author_name, // Use author or author_name
+        role: r.role || 'Author'
+      }))
+    
+    // Only add authors_names to payload if there are valid authors
+    if (cleanedAuthors.length > 0) {
+      payload.authors_names = cleanedAuthors
+    } else {
+      // Remove authors_names from payload if no valid authors
+      delete payload.authors_names
     }
   }
 
+  // Handle cover image - either uploaded file or fetched URL
+  if (addCoverFile.value) {
+    // Upload cover file if provided
+    const up = await uploadBookCover(addCoverFile.value)
+    if (up.success) {
+      payload.cover = up.file_url
+    } else {
+      const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
+      addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
+      return // Stop the process if cover upload fails
+    }
+  } else if (addCoverPreview.value && !addCoverFile.value) {
+    // Use fetched cover URL if no file was uploaded
+    // Check if it's a valid URL (from Google Books API)
+    try {
+      new URL(addCoverPreview.value)
+      payload.cover = addCoverPreview.value
+    } catch (e) {
+      // Not a valid URL, skip cover
+    }
+  }
+
+  const response = await addBookApi(payload)
   if (response.success) {
     addToast({ type: 'success', title: 'تم الحفظ', message: 'تم إضافة الكتاب بنجاح.' })
     showAddBookModal.value = false
@@ -441,7 +461,8 @@ const editBook = (book) => {
 
 const updateBook = async () => {
   const payload = { ...editBookData.value }
-
+  
+  // Handle cover image upload
   if (editCoverFile.value) {
     const up = await uploadBookCover(editCoverFile.value)
     if (up.success) {
@@ -449,6 +470,25 @@ const updateBook = async () => {
     } else {
       const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
       addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
+    }
+  }
+  
+  // Handle authors data
+  if (Array.isArray(editBookData.value.authors_names)) {
+    // Filter out empty authors and map to the correct structure
+    const cleanedAuthors = editBookData.value.authors_names
+      .filter(r => r && (r.author || r.author_name)) // Accept both author and author_name
+      .map(r => ({
+        author: r.author || r.author_name, // Use author or author_name
+        role: r.role || 'Author'
+      }))
+    
+    // Only add authors_names to payload if there are valid authors
+    if (cleanedAuthors.length > 0) {
+      payload.authors_names = cleanedAuthors
+    } else {
+      // Remove authors_names from payload if no valid authors
+      delete payload.authors_names
     }
   }
 
@@ -588,6 +628,14 @@ const getBookData = async () => {
       newBook.value.description = data.description || newBook.value.description
       newBook.value.category = data.category || newBook.value.category
       
+      // Handle cover image if provided
+      if (data.cover) {
+        // Create a preview for the cover image fetched from API
+        addCoverPreview.value = data.cover
+        // Clear the file input since we're using a URL
+        addCoverFile.value = null
+      }
+      
       // Handle authors if provided
       if (response.data.authors && Array.isArray(response.data.authors)) {
         newBook.value.authors_names = response.data.authors.map(author => ({
@@ -611,6 +659,5 @@ const getBookData = async () => {
     }
   }
 }
-
 
 </script>

@@ -14,16 +14,6 @@
       </div>
     </div>
 
-    <!-- Search and Filters -->
-    <Card>
-      <div class="card-body">
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div class="md:col-span-3">
-            <Input v-model="searchQuery" placeholder="البحث بالاسم..." class="h-full" />
-          </div>
-        </div>
-      </div>
-    </Card>
 
     <!-- Authors Table -->
     <FancyDataTable :columns="columns" :data="filteredAuthors" :page-size="10" :sortable="true" :show-page-size="true">
