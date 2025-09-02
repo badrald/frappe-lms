@@ -11,15 +11,23 @@ app_license = "mit"
 # required_apps = []
 
 # Each item in the list will be shown as an app in the apps page
-# add_to_apps_screen = [
-# 	{
-# 		"name": "lms",
-# 		"logo": "/assets/lms/logo.png",
-# 		"title": "LMS",
-# 		"route": "/lms",
-# 		"has_permission": "lms.api.permission.has_app_permission"
-# 	}
-# ]
+add_to_apps_screen = [
+	{
+		"name": "lms website",
+		"logo": "/assets/lms/frontend/assets/website_logo.png",
+		"title": "LMS website",
+		"route": "/frontend",
+		"color": "#3498db"}
+        ,
+        	{
+		"name": "LMS app",
+		"logo": "/assets/lms/frontend/assets/mange_logo.png",
+		"title": "LMS App",
+		"route": "/app",
+		"color": "#3498db"}
+
+]
+
 
 # Includes in <head>
 # ------------------
@@ -58,6 +66,9 @@ app_license = "mit"
 
 # application home page (will override Website Settings)
 # home_page = "login"
+
+# Set the login page route
+login_page = "frontend/accounts/login"
 
 # website user home page (by Role)
 # role_home_page = {
@@ -200,6 +211,11 @@ scheduler_events = {
 # 	{
 # 		"doctype": "{doctype_1}",
 # 		"filter_by": "{filter_by}",
+
+# Exempt frontend routes from CSRF validation
+csrf_exempt_routes = ["/frontend", "/frontend/*"]
+
+# 		"filter_by": "{filter_by}",
 # 		"redact_fields": ["{field_1}", "{field_2}"],
 # 		"partial": 1,
 # 	},
@@ -232,4 +248,7 @@ scheduler_events = {
 # }
 
 
-website_route_rules = [{'from_route': '/dashboard/<path:app_path>', 'to_route': 'frontend'},]
+website_route_rules = [
+    {'from_route': '/dashboard/<path:app_path>', 'to_route': 'frontend'},
+    {'from_route': '/api/session', 'to_route': 'session_api_handler'},
+]
