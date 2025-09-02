@@ -20,6 +20,8 @@ import {
 	setConfig,
 } from "frappe-ui"
 
+// Import the refreshCSRFToken function
+
 import "./index.css"
 
 const globalComponents = {
@@ -37,6 +39,7 @@ const app = createApp(App)
 const pinia = createPinia()
 
 setConfig("resourceFetcher", frappeRequest)
+
 
 // Use Pinia for state management
 app.use(pinia)

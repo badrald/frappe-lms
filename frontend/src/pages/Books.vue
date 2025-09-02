@@ -106,8 +106,14 @@
           <FormInput v-model="newBook.isbn" label="رقم ISBN" id="isbn" name="isbn" :required="true"
             class="sm:col-span-3 w-full" />
           <Button @click="getBookData"
-            class="w-full h-[42px] bg-success-800 text-white flex items-center justify-center hover:bg-success-400 text-sm">جلب
-            بيانات</Button>
+            :class="[
+              'w-full h-[42px] text-white flex items-center justify-center text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm',
+              isValidISBN ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 hover:bg-gray-500'
+            ]"
+            :disabled="!isValidISBN"
+          >
+            {{ isValidISBN ? 'جلب بيانات' : 'أدخل ISBN صحيح' }}
+          </Button>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput v-model="newBook.title" id="title" label="عنوان الكتاب" name="title`" :required="true" />
@@ -335,6 +341,11 @@ const categorySuggestions = computed(() => {
 const authorSuggestions = computed(() => {
   // Extract author names from authorsOptions for suggestions
   return authorsOptions.value.map(option => option.label)
+})
+
+const isValidISBN = computed(() => {
+  const isbn = newBook.value.isbn?.toString().trim() || ''
+  return isbn.length === 10 || isbn.length === 13
 })
 
 // Authors select options and roles
@@ -604,9 +615,9 @@ function normalizeFrappeMessage(msg) {
 }
 
 const getBookData = async () => {
-  const isbn = newBook.value.isbn
-  if (!isbn) {
-    addToast({ type: 'error', title: 'ISBN مطلوب', message: 'الرجاء إدخال رقم ISBN لجلب البيانات' })
+  const isbn = (newBook.value.isbn || '').toString().trim()
+  if (!isbn || (isbn.length !== 10 && isbn.length !== 13)) {
+    addToast({ type: 'error', title: 'ISBN غير صحيح', message: 'الرجاء إدخال رقم ISBN مكون من 10 أو 13 رقم' })
     return
   }
 
