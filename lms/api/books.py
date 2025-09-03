@@ -228,6 +228,17 @@ def add_book(**book_data):
         frappe.log_error(frappe.get_traceback(), "Error adding book")
         return {"success": False, "error": str(e)}
 
+@frappe.whitelist()
+def update_book(**bookdata):
+    try:
+        book = frappe.get_doc("Book", bookdata["name"])
+        book.update(bookdata)
+        book.save()
+        return {"success": True, "data": book.as_dict()}
+    except :
+        frappe.log_error(frappe.get_traceback(), "Error updating book")
+        return {"success": False, "error": "Error updating book"}
+
 
 
 @frappe.whitelist()
