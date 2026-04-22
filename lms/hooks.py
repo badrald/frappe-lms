@@ -1,7 +1,7 @@
 app_name = "lms"
 app_title = "LMS"
 app_publisher = "badr.alden.abdullah@gmail.com "
-app_description = "it\'s LMS aka (library managemnt System )  "
+app_description = "it's LMS aka (library managemnt System )  "
 app_email = "badr.alden.Abdullah@gmail.com "
 app_license = "mit"
 
@@ -12,20 +12,20 @@ app_license = "mit"
 
 # Each item in the list will be shown as an app in the apps page
 add_to_apps_screen = [
-	{
-		"name": "lms website",
-		"logo": "/assets/lms/frontend/assets/website_logo.png",
-		"title": "LMS website",
-		"route": "/frontend",
-		"color": "#3498db"}
-        ,
-        	{
-		"name": "LMS app",
-		"logo": "/assets/lms/frontend/assets/mange_logo.png",
-		"title": "LMS App",
-		"route": "/app",
-		"color": "#3498db"}
-
+    {
+        "name": "lms website",
+        "logo": "/assets/lms/frontend/assets/website_logo.png",
+        "title": "LMS website",
+        "route": "/frontend",
+        "color": "#3498db",
+    },
+    {
+        "name": "LMS app",
+        "logo": "/assets/lms/frontend/assets/mange_logo.png",
+        "title": "LMS App",
+        "route": "/app",
+        "color": "#3498db",
+    },
 ]
 
 
@@ -249,6 +249,6 @@ csrf_exempt_routes = ["/frontend", "/frontend/*"]
 
 
 website_route_rules = [
-    {'from_route': '/dashboard/<path:app_path>', 'to_route': 'frontend'},
-    {'from_route': '/api/session', 'to_route': 'session_api_handler'},
+    {"from_route": "/dashboard/<path:app_path>", "to_route": "frontend"},
+    {"from_route": "/api/session", "to_route": "session_api_handler"},
 ]
