@@ -1,0 +1,122 @@
+{
+ "actions": [],
+ "allow_rename": 1,
+ "autoname": "field:borrow_id",
+ "creation": "2025-08-13 10:36:37.701559",
+ "doctype": "DocType",
+ "engine": "InnoDB",
+ "field_order": [
+  "brrow_information_section",
+  "borrow_id",
+  "return",
+  "borrow_status",
+  "column_break_nlya",
+  "borrow_date",
+  "due_date",
+  "links_section",
+  "member",
+  "column_break_bfiz",
+  "book",
+  "amended_from"
+ ],
+ "fields": [
+  {
+   "fieldname": "brrow_information_section",
+   "fieldtype": "Section Break",
+   "label": "Brrow information"
+  },
+  {
+   "fieldname": "borrow_id",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Borrow ID ",
+   "reqd": 1,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_nlya",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "borrow_date",
+   "fieldtype": "Date",
+   "label": "Borrow Date"
+  },
+  {
+   "fieldname": "due_date",
+   "fieldtype": "Date",
+   "label": "Due Date"
+  },
+  {
+   "fieldname": "links_section",
+   "fieldtype": "Section Break",
+   "label": "Links"
+  },
+  {
+   "fieldname": "member",
+   "fieldtype": "Link",
+   "label": "Member",
+   "options": "Member"
+  },
+  {
+   "fieldname": "column_break_bfiz",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "book",
+   "fieldtype": "Link",
+   "label": "Book",
+   "options": "Book"
+  },
+  {
+   "fieldname": "return",
+   "fieldtype": "Link",
+   "label": "Return",
+   "options": "Return"
+  },
+  {
+   "fieldname": "amended_from",
+   "fieldtype": "Link",
+   "label": "Amended From",
+   "no_copy": 1,
+   "options": "Borrow",
+   "print_hide": 1,
+   "read_only": 1,
+   "search_index": 1
+  },
+  {
+   "fieldname": "borrow_status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Pendding\nRejected\nBorrowed\nReturned\nOverdue"
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "is_submittable": 1,
+ "links": [],
+ "modified": "2025-08-24 10:27:21.488479",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "Borrow",
+ "naming_rule": "By fieldname",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}

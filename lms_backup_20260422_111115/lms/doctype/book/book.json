@@ -1,0 +1,143 @@
+{
+ "actions": [],
+ "autoname": "autoincrement",
+ "creation": "2025-08-10 20:15:32.481204",
+ "doctype": "DocType",
+ "editable_grid": 1,
+ "engine": "InnoDB",
+ "field_order": [
+  "main_information_section",
+  "lbl_artical",
+  "title",
+  "publisher",
+  "available_copies",
+  "column_break_foiu",
+  "isbn",
+  "status",
+  "total_copies",
+  "authros_information_section",
+  "authors_names",
+  "section_break_pmua",
+  "description",
+  "cover",
+  "column_break_rtke",
+  "category"
+ ],
+ "fields": [
+  {
+   "fieldname": "lbl_artical",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Active\nInactive\nDiscontinued"
+  },
+  {
+   "fieldname": "description",
+   "fieldtype": "Text",
+   "label": "Description"
+  },
+  {
+   "fieldname": "isbn",
+   "fieldtype": "Data",
+   "label": "ISBN",
+   "length": 13,
+   "unique": 1
+  },
+  {
+   "fieldname": "column_break_foiu",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "section_break_pmua",
+   "fieldtype": "Section Break",
+   "label": "About The book"
+  },
+  {
+   "fieldname": "main_information_section",
+   "fieldtype": "Section Break",
+   "label": "Main information"
+  },
+  {
+   "fieldname": "cover",
+   "fieldtype": "Attach",
+   "label": "Cover"
+  },
+  {
+   "fieldname": "authros_information_section",
+   "fieldtype": "Section Break",
+   "label": "Authro/s Information"
+  },
+  {
+   "fieldname": "authors_names",
+   "fieldtype": "Table",
+   "in_filter": 1,
+   "label": "Authors Names",
+   "options": "Book Author"
+  },
+  {
+   "fetch_from": "author.name1",
+   "fieldname": "publisher",
+   "fieldtype": "Link",
+   "label": "Publisher",
+   "options": "Publisher"
+  },
+  {
+   "fieldname": "total_copies",
+   "fieldtype": "Int",
+   "label": "Total Copies"
+  },
+  {
+   "fieldname": "available_copies",
+   "fieldtype": "Int",
+   "label": "Available Copies"
+  },
+  {
+   "fieldname": "column_break_rtke",
+   "fieldtype": "Column Break"
+  },
+  {
+   "fieldname": "category",
+   "fieldtype": "Link",
+   "label": "Category ",
+   "options": "Category"
+  },
+  {
+   "fieldname": "title",
+   "fieldtype": "Data",
+   "in_list_view": 1,
+   "label": "Title",
+   "length": 70,
+   "reqd": 1
+  }
+ ],
+ "grid_page_length": 50,
+ "index_web_pages_for_search": 1,
+ "links": [],
+ "modified": "2025-09-01 08:30:14.179371",
+ "modified_by": "Administrator",
+ "module": "LMS",
+ "name": "Book",
+ "naming_rule": "Autoincrement",
+ "owner": "Administrator",
+ "permissions": [
+  {
+   "create": 1,
+   "delete": 1,
+   "email": 1,
+   "export": 1,
+   "print": 1,
+   "read": 1,
+   "report": 1,
+   "role": "System Manager",
+   "share": 1,
+   "write": 1
+  }
+ ],
+ "row_format": "Dynamic",
+ "sort_field": "modified",
+ "sort_order": "DESC",
+ "states": []
+}
