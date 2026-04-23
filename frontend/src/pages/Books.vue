@@ -75,6 +75,7 @@
     </div>
 
     <!-- Add Book Modal -->
+
     <ModernDialog v-model="showAddBookModal" size="xl" layout="split">
       <template #title>
         إضافة كتاب جديد
@@ -101,14 +102,17 @@
       <!-- Body -->
       <form @submit.prevent="addBook" class="space-y-4">
 
-
         <div class="grid grid-cols-1 sm:grid-cols-4 gap-4 items-end">
           <FormInput v-model="newBook.isbn" label="رقم ISBN" id="isbn" name="isbn" :required="true"
             class="sm:col-span-3 w-full" />
-          <Button @click="getBookData"
-            class="w-full h-[42px] bg-success-800 text-white flex items-center justify-center hover:bg-success-400 text-sm">جلب
-            بيانات</Button>
+          <Button @click="getBookData" :class="[
+            'w-full h-[42px] text-white flex items-center justify-center text-sm font-medium rounded-lg transition-colors duration-200 shadow-sm',
+            isValidISBN ? 'bg-green-600 hover:bg-green-700' : 'bg-gray-400 hover:bg-gray-500'
+          ]" :disabled="!isValidISBN">
+            {{ isValidISBN ? 'جلب بيانات' : 'أدخل ISBN صحيح' }}
+          </Button>
         </div>
+
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <FormInput v-model="newBook.title" id="title" label="عنوان الكتاب" name="title`" :required="true" />
           <FormInput v-model="newBook.publisher" label="الناشر" name="publisher" :suggestions="publisherSuggestions" />
@@ -139,8 +143,8 @@
             مؤلف.</div>
           <div v-for="(row, idx) in newBook.authors_names" :key="`author-row-${idx}`"
             class="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
-            <FormInput v-model="row.author" :name="`author_${idx}`" label="المؤلف"
-              :suggestions="authorSuggestions" placeholder="أدخل اسم المؤلف" clearable />
+            <FormInput v-model="row.author" :name="`author_${idx}`" label="المؤلف" :suggestions="authorSuggestions"
+              placeholder="أدخل اسم المؤلف" clearable />
             <FormSelect v-model="row.role" :options="roleOptions" :name="`role_${idx}`" label="الدور"
               placeholder="اختر الدور" clearable />
             <div>
@@ -152,7 +156,7 @@
 
       <!-- Actions -->
       <template #actions>
-        <Button @click="showAddBookModal = false" theme="gray" class="mr-2 bg-red-800 text-white">إلغاء</Button>
+        <Button @click="showAddBookModal = false" theme="red" class="mr-2 bg-red-800 text-white">إلغاء</Button>
         <Button @click="addBook" theme="primary" class="bg-primary-600 text-white p-3">حفط</Button>
       </template>
     </ModernDialog>
@@ -169,15 +173,19 @@
       <!-- Body -->
       <form @submit.prevent="updateBook" class="space-y-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <FormInput v-model="editBookData.title" label="Title" class="w-full" />
-          <FormInput v-model="editBookData.isbn" label="ISBN" class="w-full" />
-          <FormInput v-model="editBookData.publisher" label="Publisher" name="publisher_edit"
+          <FormInput v-model="editBookData.title" label="العنوان" class="w-full" />
+          <FormInput v-model="editBookData.isbn" label="رقم ISBN" class="w-full" />
+          <FormInput v-model="editBookData.publisher" label="الناشر" name="publisher_edit"
             :suggestions="publisherSuggestions" class="w-full" />
-          <FormInput v-model="editBookData.status" label="Status" class="w-full" />
-          <FormInput v-model="editBookData.category" label="Category" name="category_edit"
+          <FormSelect v-model="editBookData.status" label="الحالة" name="status_edit"
+            :options="[
+              { label: 'متاح', value: 'Active' },
+              { label: 'مستعار', value: 'Inactive' },
+            ]" class="w-full" />
+          <FormInput v-model="editBookData.category" label="الفئة" name="category_edit"
             :suggestions="categorySuggestions" class="w-full" />
-          <FormInput v-model="editBookData.total_copies" label="Total Copies" class="w-full" />
-          <FormInput v-model="editBookData.available_copies" label="Available Copies" class="w-full" />
+          <FormInput v-model="editBookData.total_copies" label="عدد الكتب" class="w-full" />
+          <FormInput v-model="editBookData.available_copies" label="عدد المتوفر" class="w-full" />
         </div>
       </form>
 
@@ -205,6 +213,7 @@
       </template>
     </ModernDialog>
 
+
     <!-- Delete Book Confirmation Modal -->
     <ModernDialog v-model="showDeleteBookModal">
       <template #title>
@@ -221,8 +230,8 @@
 
       <!-- Actions -->
       <template #actions>
-        <Button @click="showDeleteBookModal = false" theme="gray" class="btn bg-gray-200 p-4 ml-2">الغاء</Button>
-        <Button @click="confirmDeleteBook" class="btn bg-red-500 hover:bg-current text-white p-4 ">حذف</Button>
+        <Button @click="showDeleteBookModal = false" class="bg-primary-500  p-4 ml-2">الغاء</Button>
+        <Button @click="confirmDeleteBook" class="bg-red-700 hover:bg-current text-white p-4 ">حذف</Button>
       </template>
     </ModernDialog>
 
@@ -285,15 +294,18 @@ const newBook = ref({
 
 const editBookData = ref({
   name: '',
-  title: '',
+  title: '',  // Changed from article_name to title for consistency
   isbn: '',
   publisher: '',
   status: 'Active',
+  category: '',
+  total_copies: '',
+  available_copies: '',
 })
 
 const deleteBookData = ref({
   name: '',
-  title: '',
+  title: '',  // Changed from article_name to title for consistency
 })
 
 const filteredBooks = computed(() => {
@@ -335,6 +347,11 @@ const categorySuggestions = computed(() => {
 const authorSuggestions = computed(() => {
   // Extract author names from authorsOptions for suggestions
   return authorsOptions.value.map(option => option.label)
+})
+
+const isValidISBN = computed(() => {
+  const isbn = newBook.value.isbn?.toString().trim() || ''
+  return isbn.length === 10 || isbn.length === 13
 })
 
 // Authors select options and roles
@@ -392,7 +409,7 @@ const addBook = async () => {
         author: r.author || r.author_name, // Use author or author_name
         role: r.role || 'Author'
       }))
-    
+
     // Only add authors_names to payload if there are valid authors
     if (cleanedAuthors.length > 0) {
       payload.authors_names = cleanedAuthors
@@ -455,66 +472,58 @@ const addBook = async () => {
 }
 
 const editBook = (book) => {
-  editBookData.value = { ...book }
+  // Ensure we're using consistent field names
+  editBookData.value = { 
+    name: book.name,
+    title: book.title || book.article_name || '',  // Handle both field names
+    isbn: book.isbn || '',
+    publisher: book.publisher || '',
+    status: book.status || 'Active',
+    category: book.category || '',
+    total_copies: book.total_copies || '',
+    available_copies: book.available_copies || ''
+  }
   showEditBookModal.value = true
 }
 
 const updateBook = async () => {
-  const payload = { ...editBookData.value }
-  
-  // Handle cover image upload
-  if (editCoverFile.value) {
-    const up = await uploadBookCover(editCoverFile.value)
-    if (up.success) {
-      payload.cover = up.file_url
-    } else {
-      const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
-      addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
-    }
-  }
-  
-  // Handle authors data
-  if (Array.isArray(editBookData.value.authors_names)) {
-    // Filter out empty authors and map to the correct structure
-    const cleanedAuthors = editBookData.value.authors_names
-      .filter(r => r && (r.author || r.author_name)) // Accept both author and author_name
-      .map(r => ({
-        author: r.author || r.author_name, // Use author or author_name
-        role: r.role || 'Author'
-      }))
-    
-    // Only add authors_names to payload if there are valid authors
-    if (cleanedAuthors.length > 0) {
-      payload.authors_names = cleanedAuthors
-    } else {
-      // Remove authors_names from payload if no valid authors
-      delete payload.authors_names
-    }
-  }
+  try {
+    const payload = { ...editBookData.value }
 
-  const response = await updateBookApi(payload)
-  if (response.success) {
-    addToast({ type: 'success', title: 'تم التحديث', message: 'تم تحديث بيانات الكتاب بنجاح.' })
-    showEditBookModal.value = false
-    if (editCoverPreview.value) URL.revokeObjectURL(editCoverPreview.value)
-    editCoverFile.value = null
-    editCoverPreview.value = null
-  } else {
-    // Improved error handling with more specific messages
-    let msg = 'حدث خطأ أثناء تحديث بيانات الكتاب.'
-    if (response.error && response.error.message) {
-      msg = response.error.message
-    } else {
-      msg = extractErrorMessage(response.error) || msg
+    if (editCoverFile.value) {
+      const up = await uploadBookCover(editCoverFile.value)
+      if (up.success) {
+        payload.cover = up.file_url
+      } else {
+        const msg = extractErrorMessage(up.error) || 'فشل في رفع صورة الغلاف.'
+        addToast({ type: 'warning', title: 'تعذر رفع الغلاف', message: msg })
+        return
+      }
     }
+
+    const response = await updateBookApi(payload)
+    if (response.success) {
+      addToast({ type: 'success', title: 'تم التحديث', message: 'تم تحديث بيانات الكتاب بنجاح.' })
+      showEditBookModal.value = false
+      if (editCoverPreview.value) URL.revokeObjectURL(editCoverPreview.value)
+      editCoverFile.value = null
+      editCoverPreview.value = null
+      // Refresh the books list
+      await booksResource.reload()
+    } else {
+      const msg = extractErrorMessage(response.error) || 'حدث خطأ أثناء تحديث بيانات الكتاب.'
+      addToast({ type: 'error', title: 'فشل التحديث', message: msg })
+    }
+  } catch (error) {
+    const msg = extractErrorMessage(error) || 'حدث خطأ أثناء تحديث بيانات الكتاب.'
     addToast({ type: 'error', title: 'فشل التحديث', message: msg })
   }
 }
 
-// const deleteBook = (book) => {
-//   deleteBookData.value = { name: book.name, title: book.title }
-//   showDeleteBookModal.value = true
-// }
+const deleteBook = (book) => {
+  deleteBookData.value = { name: book.name, title: book.title }
+  showDeleteBookModal.value = true
+}
 
 const confirmDeleteBook = async () => {
   const response = await deleteBookApi(deleteBookData.value.name)
@@ -604,9 +613,9 @@ function normalizeFrappeMessage(msg) {
 }
 
 const getBookData = async () => {
-  const isbn = newBook.value.isbn
-  if (!isbn) {
-    addToast({ type: 'error', title: 'ISBN مطلوب', message: 'الرجاء إدخال رقم ISBN لجلب البيانات' })
+  const isbn = (newBook.value.isbn || '').toString().trim()
+  if (!isbn || (isbn.length !== 10 && isbn.length !== 13)) {
+    addToast({ type: 'error', title: 'ISBN غير صحيح', message: 'الرجاء إدخال رقم ISBN مكون من 10 أو 13 رقم' })
     return
   }
 
@@ -619,7 +628,7 @@ const getBookData = async () => {
     }
 
     const response = await FeatchBookData(isbn)
-    
+
     if (response.success) {
       // Populate the form with fetched data
       const data = response.data.fields || {}
@@ -627,7 +636,7 @@ const getBookData = async () => {
       newBook.value.publisher = data.publisher || newBook.value.publisher
       newBook.value.description = data.description || newBook.value.description
       newBook.value.category = data.category || newBook.value.category
-      
+
       // Handle cover image if provided
       if (data.cover) {
         // Create a preview for the cover image fetched from API
@@ -635,7 +644,7 @@ const getBookData = async () => {
         // Clear the file input since we're using a URL
         addCoverFile.value = null
       }
-      
+
       // Handle authors if provided
       if (response.data.authors && Array.isArray(response.data.authors)) {
         newBook.value.authors_names = response.data.authors.map(author => ({
@@ -643,7 +652,7 @@ const getBookData = async () => {
           role: author.role || 'Author'
         }))
       }
-      
+
       addToast({ type: 'success', title: 'تم جلب البيانات', message: 'تم جلب بيانات الكتاب بنجاح' })
     } else {
       const errorMsg = response.error?.message || 'فشل في جلب بيانات الكتاب'

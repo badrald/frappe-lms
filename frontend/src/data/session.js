@@ -21,7 +21,6 @@ export function sessionUser() {
 
 export function sessionCSRFToken() {
 	const cookies = new URLSearchParams(document.cookie.split("; ").join("&"))
-	console.log(cookies.get("csrf_token"))
 	return cookies.get("csrf_token")
 }
 
@@ -36,9 +35,7 @@ export const session = reactive({
 		},
 		onSuccess(data) {
 			userResource.reload()
-			alert(data.message);
 			session.user = sessionUser()
-			// Get CSRF token set by server on successful login and expose it globally
 			const token = sessionCSRFToken()
 			if (token) {
 				window.csrf_token = token

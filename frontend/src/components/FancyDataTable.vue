@@ -28,11 +28,11 @@
             <table class="min-w-full table-auto">
                 <thead class="bg-gray-50">
                     <tr>
-                        <th v-if="selectable" class="p-3 text-left">
+                        <th v-if="selectable" class="p-3 text-center">
                             <input type="checkbox" :checked="allSelected"
                                 @change="toggleSelectAll($event.target.checked)" />
                         </th>
-                        <th v-for="col in columns" :key="col.key" class="p-3 text-left">
+                        <th v-for="col in columns" :key="col.key" class="p-3 text-cetner">
                             <button v-if="col.sortable !== false && sortable" @click="toggleSort(col.key)"
                                 class="flex items-center gap-2">
                                 <span>{{ col.label }}</span>
@@ -62,13 +62,13 @@
                 </thead>
                 <tbody>
                     <tr v-for="row in paginatedData" :key="getRowKey(row)" class="border-b hover:bg-gray-50">
-                        <td v-if="selectable" class="p-3">
+                        <td v-if="selectable" class="p-3 text-center" >
                             <input type="checkbox" :checked="isSelected(row)"
                                 @change="toggleRow(row, $event.target.checked)" />
                         </td>
                         <td v-for="col in columns" :key="col.key + '-cell'" class="p-3 align-top">
                             <slot :name="`cell-${col.key}`" :row="row">
-                                <div class="text-sm text-gray-800">
+                                <div class="text-sm text-gray-800 text-center">
                                     {{ formatCell(row[col.key], col) }}
                                 </div>
                             </slot>
