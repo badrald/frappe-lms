@@ -2,8 +2,10 @@ app_name = "lms"
 app_title = "LMS"
 app_publisher = "badr.alden.abdullah@gmail.com "
 app_description = "it's LMS aka (library managemnt System )  "
-app_email = "badr.alden.Abdullah@gmail.com "
+app_email = "badr.alden.abdullah@gmail.com "
 app_license = "mit"
+
+
 
 # Apps
 # ------------------
